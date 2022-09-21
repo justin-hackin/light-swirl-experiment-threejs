@@ -5,7 +5,7 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 // TODO: why '?url' suffix needed when gltf in assetsInclude
 
 import modelUrl from "./models/swirl.gltf?url";
-import { Mesh } from "three";
+import { Mesh, MeshStandardMaterial } from "three";
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitPointLight } from "./OrbitPointLight";
 
@@ -15,12 +15,17 @@ type GLTFResult = GLTF & {
   }
 }
 
+const SURFACE_MATERIAL = new MeshStandardMaterial({ color: '#fff'});
+const BASE_RADIUS = 4;
+const BASE_HEIGHT = 0.2;
+const BASE_SEGMENTS = 20;
+
 export function Scene() {
   const PARAMS = useControls({
-    interval1: { value: 13, min: 1, max: 20 },
-    interval2: { value: 20, min: 1, max: 20 },
-    intervalScale: { value: 0.5, min: 0.1, max: 3 },
-    yPosition: { value: 0, min: 0, max: 5, step: 0.1 },
+    firstSphereRotationInterval: { value: 13, min: 1, max: 20 },
+    secondSphereRotationInterval: { value: 20, min: 1, max: 20 },
+    rotationIntervalScale: { value: 0.5, min: 0.1, max: 3 },
+    yPosition: { value: 0.5, min: 0.5, max: 5, step: 0.1 },
     showLightPosition: true
   });
 
@@ -32,14 +37,16 @@ export function Scene() {
       <OrbitControls />
       <group position={[0, -2, 0]}>
         <OrbitPointLight
-          color={"#ff00d5"} yPosition={PARAMS.yPosition} interval={PARAMS.interval1 * PARAMS.intervalScale}
+          color={"#ff00d5"} yPosition={PARAMS.yPosition} interval={PARAMS.firstSphereRotationInterval * PARAMS.rotationIntervalScale}
           orbitRadius={radius} offsetRatio={0.5} showPosition={PARAMS.showLightPosition} />
         <OrbitPointLight color={"#00e1ff"} yPosition={PARAMS.yPosition}
-                         interval={PARAMS.interval2 * PARAMS.intervalScale} orbitRadius={radius}
+                         interval={PARAMS.secondSphereRotationInterval * PARAMS.rotationIntervalScale} orbitRadius={radius}
                          showPosition={PARAMS.showLightPosition} />
-        <mesh geometry={nodes.Swirl.geometry}>
-          <meshStandardMaterial color={"#fff"} />
+        <mesh geometry={nodes.Swirl.geometry} material={SURFACE_MATERIAL}>
           <ambientLight intensity={0.1} />
+        </mesh>
+        <mesh material={SURFACE_MATERIAL} position-y={(BASE_HEIGHT / 2)}>
+          <cylinderGeometry args={[BASE_RADIUS, BASE_RADIUS, BASE_HEIGHT, BASE_SEGMENTS]} />
         </mesh>
       </group>
     </Canvas>
