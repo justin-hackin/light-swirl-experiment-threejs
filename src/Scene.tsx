@@ -2,6 +2,7 @@ import React from "react";
 import { useControls } from "leva";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
+import { capitalize, lowerCase } from "lodash-es";
 // TODO: why '?url' suffix needed when gltf in assetsInclude
 
 import modelUrl from "./models/swirl.gltf?url";
@@ -17,16 +18,26 @@ type GLTFResult = GLTF & {
 
 const SURFACE_MATERIAL = new MeshStandardMaterial({ color: '#fff'});
 const BASE_RADIUS = 4;
-const BASE_HEIGHT = 0.2;
+const BASE_HEIGHT = 0.1;
 const BASE_SEGMENTS = 20;
 
+const addNamesToControlsSchema = (schema: Record<string, Record<string, any>>):void => {
+  Object.keys(schema).forEach((key) => {
+    schema[key].label = capitalize(lowerCase(key));
+  });
+};
+const controlsSchema = {
+  firstSphereRotationInterval: { value: 13, min: 1, max: 20 },
+  secondSphereRotationInterval: { value: 20, min: 1, max: 20 },
+  rotationIntervalScale: { value: 0.5, min: 0.1, max: 3 },
+  yPosition: { value: 0.5, min: 0.5, max: 5, step: 0.1 },
+  showLightPosition: { value: true }
+};
+addNamesToControlsSchema(controlsSchema);
+
 export function Scene() {
-  const PARAMS = useControls({
-    firstSphereRotationInterval: { value: 13, min: 1, max: 20 },
-    secondSphereRotationInterval: { value: 20, min: 1, max: 20 },
-    rotationIntervalScale: { value: 0.5, min: 0.1, max: 3 },
-    yPosition: { value: 0.5, min: 0.5, max: 5, step: 0.1 },
-    showLightPosition: true
+  const PARAMS = useControls(controlsSchema, {
+    oneLineLabels: true,
   });
 
   const { nodes } = useGLTF(modelUrl) as unknown as GLTFResult;

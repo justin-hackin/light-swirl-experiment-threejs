@@ -12,6 +12,7 @@
     "@react-three/fiber": "^8.7.4",
     "@types/three": "^0.144.0",
     "leva": "^0.9.31",
+    "lodash-es": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "three": "^0.144.0"
@@ -22,6 +23,7 @@
     "@testing-library/react": "^12.1.5",
     "@tweakpane/core": "^1.1.0",
     "@types/jest": "^27.4.1",
+    "@types/lodash-es": "^4.17.6",
     "@types/react": "^18.0.20",
     "@types/react-dom": "^18.0.6",
     "@types/testing-library__jest-dom": "^5.14.3",
