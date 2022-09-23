@@ -22,7 +22,7 @@ const BASE_RADIUS = 4;
 const BASE_HEIGHT = 0.1;
 const BASE_SEGMENTS = 20;
 
-const addNamesToControlsSchema = (schema: Record<string, Record<string, any>>):void => {
+export const addNamesToControlsSchema = (schema: Record<string, Record<string, any>>):void => {
   Object.keys(schema).forEach((key) => {
     schema[key].label = capitalize(lowerCase(key));
   });

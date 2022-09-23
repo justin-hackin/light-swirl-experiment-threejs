@@ -1,22 +1,19 @@
-import { OrbitControls, PerspectiveCamera, useAnimations } from "@react-three/drei";
 import { useControls } from "leva";
+import { CameraControls } from "./CameraControls";
 import React, { useEffect, useRef, useState } from "react";
-import { useThree } from "@react-three/fiber";
-import { AnimationClip, Group, NumberKeyframeTrack, Vector3 } from "three";
+import { gsap } from "gsap";
+// @ts-ignore
+import Timeline = gsap.core.Timeline;
+import { addNamesToControlsSchema } from "./Scene";
 
+const BASE_DURATION = 10;
 enum CAMERA_MODE {
   BIRDS_EYE_ZOOM='BIRDS_EYE_ZOOM',
   MERRY_GO_ROUND='MERRY_GO_ROUND',
   ORBIT_CONTROLS='ORBIT_CONTROLS',
 }
-const DEFAULT_CAMERA_DIST = 7;
-const CAMERA_POS = new Vector3(DEFAULT_CAMERA_DIST, 0, 0);
 export function OrbitControlsWithAnimationSequences () {
-  const { camera } = useThree();
-  const orbitControlsRef = useRef(null!);
-  const cameraRef = useRef(null!);
-  const [controlsEnabled, setControlsEnabled] = useState(true);
-  const PARAMS = useControls({
+  const controlsSchema = {
     cameraMode: {
       value: CAMERA_MODE.ORBIT_CONTROLS,
       options: {
@@ -25,56 +22,56 @@ export function OrbitControlsWithAnimationSequences () {
         'Bird\'s eye zoom': CAMERA_MODE.BIRDS_EYE_ZOOM,
       },
     },
-    animationInterval: 5,
-  });
+    animationDurationScale: { value: 1, min: 0.1, max: 10, step: 0.1 },
+  };
+  addNamesToControlsSchema(controlsSchema);
+  const PARAMS = useControls(controlsSchema);
 
-  const { actions, ref: cameraGroupRef } = useAnimations([
-    new AnimationClip(CAMERA_MODE.BIRDS_EYE_ZOOM, PARAMS.animationInterval, [
-      new NumberKeyframeTrack('.position[y]',
-        [0, PARAMS.animationInterval/2, PARAMS.animationInterval],
-        [DEFAULT_CAMERA_DIST, 0, DEFAULT_CAMERA_DIST])
-    ]),
-    new AnimationClip(CAMERA_MODE.MERRY_GO_ROUND, PARAMS.animationInterval, [
-      new NumberKeyframeTrack('.rotation[y]',
-        [0, PARAMS.animationInterval],
-        [0, Math.PI * 2])
-    ]),
-  ]);
+  const controlsRef = useRef<CameraControls>(null!);
+  const [controlsEnabled, setControlsEnabled] = useState(true);
+  const [loopedAnimation, setLoopedAnimation] = useState<Timeline | null>(null);
 
   useEffect(() => {
-    const cameraGroup = cameraGroupRef.current as Group;
-    console.log(cameraGroup.position);
-    const stopAll = () => {
-      actions[CAMERA_MODE.MERRY_GO_ROUND]?.stop();
-      actions[CAMERA_MODE.BIRDS_EYE_ZOOM]?.stop();
-    };
-    const isOrbit = PARAMS.cameraMode === CAMERA_MODE.ORBIT_CONTROLS;
-    setControlsEnabled(isOrbit);
-    camera.position.set(...CAMERA_POS.toArray());
-    cameraGroup.position.set(0,0,0);
-    cameraGroup.rotation.y = 0;
-    camera.lookAt(0, 0, 0);
-    stopAll();
-    if (!isOrbit) {
-      if (PARAMS.cameraMode === CAMERA_MODE.BIRDS_EYE_ZOOM) {
-        camera.position.set(0, 0, 0);
-        cameraGroup.position.set(0, DEFAULT_CAMERA_DIST, 0);
-        camera.lookAt(0, 0, 0);
-      }
-      actions[PARAMS.cameraMode]?.play();
-
-    } else {
-      // @ts-ignore
-      orbitControlsRef?.current?.update();
+    console.log(controlsRef?.current?.polarAngle);
+    setControlsEnabled(PARAMS.cameraMode === CAMERA_MODE.ORBIT_CONTROLS);
+    if (loopedAnimation) {
+      loopedAnimation.kill();
+    }
+    if (PARAMS.cameraMode === CAMERA_MODE.BIRDS_EYE_ZOOM) {
+      (async() => {
+        await gsap.to(controlsRef.current, { duration: 2, azimuthAngle: 0, polarAngle: 0, distance: 5,  ease: 'expo.out' });
+        const tl = gsap.timeline({ repeat: -1 });
+        tl.to(controlsRef.current, { duration: BASE_DURATION, repeat: -1, azimuthAngle: 2 * Math.PI , ease: 'none' }, 0);
+        tl.to(controlsRef.current, { duration: BASE_DURATION, distance: 1, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0);
+        setLoopedAnimation(tl);
+      })();
+    } else if (PARAMS.cameraMode === CAMERA_MODE.ORBIT_CONTROLS) {
+      controlsRef.current.reset(true);
+      setLoopedAnimation(null);
+    } else if (PARAMS.cameraMode == CAMERA_MODE.MERRY_GO_ROUND) {
+      (async() => {
+        await controlsRef.current.reset(true);
+        const tl = gsap.timeline({ repeat: -1 });
+        tl.to(controlsRef.current, { duration: BASE_DURATION, repeat: -1, azimuthAngle: 2 * Math.PI , ease: 'none' }, 0);
+        tl.to(controlsRef.current, { duration: BASE_DURATION, polarAngle: 0.9, repeat: -1, yoyo: true, ease: 'sine.inOut' }, 0);
+        setLoopedAnimation(tl);
+      })();
     }
   }, [PARAMS.cameraMode]);
 
-  useEffect(() => {console.log(camera, cameraRef.current === camera )}, [camera]);
+  useEffect(() => {
+    if (loopedAnimation) {
+      loopedAnimation.timeScale(PARAMS.animationDurationScale);
+    }
+  }, [PARAMS.animationDurationScale]);
 
-  return (<>
-    <group ref={cameraGroupRef}>
-      <PerspectiveCamera makeDefault ref={cameraRef} position={CAMERA_POS.toArray()} />
-    </group>
-    <OrbitControls makeDefault enabled={controlsEnabled} camera={camera}/>
-  </>);
+  useEffect(() => {
+    controlsRef.current.enabled = controlsEnabled;
+  }, [controlsEnabled]);
+
+  useEffect(() => {
+    console.log(controlsRef?.current?.polarAngle);
+  }, [controlsRef?.current?.polarAngle]);
+
+  return (<CameraControls ref={controlsRef} />);
 }
