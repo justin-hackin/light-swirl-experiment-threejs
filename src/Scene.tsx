@@ -1,7 +1,7 @@
 import React from "react";
 import { useControls } from "leva";
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import { useGLTF } from "@react-three/drei";
 import { capitalize, lowerCase } from "lodash-es";
 // TODO: why '?url' suffix needed when gltf in assetsInclude
 
@@ -9,6 +9,7 @@ import modelUrl from "./models/swirl.gltf?url";
 import { Mesh, MeshStandardMaterial } from "three";
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitPointLight } from "./OrbitPointLight";
+import { OrbitControlsWithAnimationSequences } from "./OrbitControlsWithAnimationSequences";
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -45,7 +46,7 @@ export function Scene() {
 
   return (
     <Canvas>
-      <OrbitControls />
+      <OrbitControlsWithAnimationSequences />
       <group position={[0, -2, 0]}>
         <OrbitPointLight
           color={"#ff00d5"} yPosition={PARAMS.yPosition} interval={PARAMS.firstSphereRotationInterval * PARAMS.rotationIntervalScale}
