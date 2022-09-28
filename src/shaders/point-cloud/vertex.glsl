@@ -9,15 +9,15 @@ float getPhi(in float y, in float x)
         } else if (y > 0.0) {
             return PI/2.0;
         } else {
-            return -1.0 * PI/2.0;
+            return -PI/2.0;
         }
     } else if (x > 0.0) {
         return atan(y/x);
-    } else if (x < 0.0) {
+    } else {
         if (y >= 0.0) {
             return atan(y/x) + PI;
         } else {
-            return atan(y/x) + PI;
+            return atan(y/x) - PI;
         }
     }
 }
@@ -44,7 +44,7 @@ void main()
     vec3 sphericalPt = toPolar(position);
 
     vec3 sphericalDisp = vec3(
-        sphericalPt.x + sin(position.x * 2.0 + position.y * 5.0 + position.z * 12.0 ) * disp,
+        sphericalPt.x + sin((sphericalPt.y + PI) * 16.0)  * disp,
         sphericalPt.y,
         sphericalPt.z
     );

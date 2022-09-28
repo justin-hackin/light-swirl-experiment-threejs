@@ -23,8 +23,8 @@ declare global {
 }
 
 export function PointCloud() {
-  return (<mesh>
-    <sphereGeometry args={[10, 64, 64]} attach="geometry"  />
+  return (<mesh rotation-x={Math.PI/2}>
+    <icosahedronGeometry args={[20, 16]} attach="geometry" />
     <radialTwistedRippleMaterial key={RadialTwistedRippleMaterial.key} attach="material"  />
   </mesh>);
 }
