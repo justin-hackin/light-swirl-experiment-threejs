@@ -31,7 +31,7 @@ export function OrbitPointLight({ color, yPosition, orbitRadius, interval, showP
       { showPosition && (
         <mesh>
           <sphereGeometry  />
-          <meshBasicMaterial color={color} />
+          <meshBasicMaterial color={color} transparent={true} opacity={0.5} />
         </mesh>
       )}
     </mesh>
