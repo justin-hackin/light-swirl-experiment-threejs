@@ -10,6 +10,7 @@ import { Mesh, MeshStandardMaterial } from "three";
 import { GLTF } from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitPointLight } from "./OrbitPointLight";
 import { OrbitControlsWithAnimationSequences } from "./OrbitControlsWithAnimationSequences";
+import { PointCloud } from "./PointCloud";
 
 type GLTFResult = GLTF & {
   nodes: {
@@ -47,6 +48,7 @@ export function Scene() {
   return (
     <Canvas>
       <OrbitControlsWithAnimationSequences />
+      <PointCloud />
       <group position={[0, -2, 0]}>
         <OrbitPointLight
           color={"#ff00d5"} yPosition={PARAMS.yPosition} interval={PARAMS.firstSphereRotationInterval * PARAMS.rotationIntervalScale}

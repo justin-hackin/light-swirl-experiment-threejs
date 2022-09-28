@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES5",
+    "target": "ESNext",
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "types": ["vite/client", "jest", "testing-library__jest-dom"],
     "allowJs": true,
@@ -16,5 +16,5 @@
     "noEmit": true,
     "jsx": "react"
   },
-  "include": ["./src", "./src/models/swirl.gltf"]
+  "include": ["./src", "./src/models/swirl.gltf", "./src/**/*.glsl"]
 }
