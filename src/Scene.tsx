@@ -49,6 +49,7 @@ export function Scene() {
     <Canvas>
       <OrbitControlsWithAnimationSequences />
       <PointCloud />
+      {/* TODO: consider making the model generated within ThreeJS, parameterizing */}
       <group position={[0, -2, 0]}>
         <OrbitPointLight
           color={"#ff00d5"} yPosition={PARAMS.yPosition} interval={PARAMS.firstSphereRotationInterval * PARAMS.rotationIntervalScale}
