@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@react-three/drei": "^9.31.1",
-    "@react-three/fiber": "^8.7.4",
+    "@react-three/fiber": "^8.9.1",
     "@types/three": "^0.144.0",
     "camera-controls": "^1.37.2",
     "gsap": "^3.11.1",
